@@ -9,6 +9,12 @@ import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.mybatis.pagehelper.page.PageMethod;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.cache.CacheKey;
@@ -26,6 +32,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.CollectionUtils;
 
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.util.*;
@@ -96,17 +103,21 @@ public class DataPermissionsInterceptor implements Interceptor{
             //初始化bean
             this.loadService();
             List<Long> unitIdList = this.getUnitIdList(mappedStatement, boundSql, permissionIntercept);
+            String addSQL = null;
             if (!CollectionUtils.isEmpty(unitIdList)){
-                StringBuilder stringBuilder = new StringBuilder(" and ");
+                StringBuilder stringBuilder = new StringBuilder(" ");
                 stringBuilder.append(permissionIntercept.permissionField()).append(" in (");
                 unitIdList.forEach(unitId ->{
                     stringBuilder.append(unitId).append(",");
                 });
                 stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                 stringBuilder.append(") ");
-                mSql = sql + stringBuilder.toString();
+                addSQL =  stringBuilder.toString();
             }else {
-                mSql = sql + " and 1=2 ";
+                addSQL = " 1=2 ";
+            }
+            if (StringUtils.isNotEmpty(addSQL)){
+                mSql = this.buildNewSql(addSQL, sql);
             }
             PageRequest pageRequest = new PageRequest();
             pageRequest.setPage(info.getPage());
@@ -136,6 +147,37 @@ public class DataPermissionsInterceptor implements Interceptor{
 //        field.set(boundSql, mSql);
         unitIdListEnable.remove();
         return invocation.proceed();
+    }
+
+    private String buildNewSql(String addSQL, String sql) throws JSQLParserException {
+        StringBuffer whereSql = new StringBuffer();
+        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+        Select select = (Select) parserManager.parse(new StringReader(sql));
+        PlainSelect plain = (PlainSelect) select.getSelectBody();
+        //增加sql语句的逻辑部分处理
+        whereSql.append(addSQL);
+        // 获取当前查询条件
+        Expression where = plain.getWhere();
+        if (where == null) {
+            if (whereSql.length() > 0) {
+                Expression expression = CCJSqlParserUtil
+                        .parseCondExpression(whereSql.toString());
+                Expression whereExpression = (Expression) expression;
+                plain.setWhere(whereExpression);
+            }
+        } else {
+            if (whereSql.length() > 0) {
+                //where条件之前存在，需要重新进行拼接
+                whereSql.append(" and " + where.toString() + " ");
+            } else {
+                //新增片段不存在，使用之前的sql
+                whereSql.append(where.toString());
+            }
+            Expression expression = CCJSqlParserUtil
+                    .parseCondExpression(whereSql.toString());
+            plain.setWhere(expression);
+        }
+        return select.toString();
     }
 
     /**

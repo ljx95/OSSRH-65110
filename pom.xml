@@ -5,7 +5,7 @@
 
     <groupId>com.github.ljx95</groupId>
     <artifactId>data-permission-helper-starter</artifactId>
-    <version>1.0.9.RELEASE</version>
+    <version>1.1.1.RELEASE</version>
     <name>data-permission-helper-starter</name>
     <url>https://github.com/ljx95/OSSRH-65110</url>
     <parent>
