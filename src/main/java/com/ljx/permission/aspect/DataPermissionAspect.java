@@ -96,7 +96,15 @@ public class DataPermissionAspect {
             unitIdList = dataAccessScopeService.selectRuleIdList(userId, roleIds, permissionObject, permissionLevel);
         }
         List<Long> longs = unitIdList.stream().distinct().collect(Collectors.toList());
-        DataPermissionsInterceptor.unitIdListEnable.set(longs);
+        if (userDetails.getAdmin()){
+            DataPermissionsInterceptor.unitIdListEnable.set(null);
+        }else {
+            if (CollectionUtils.isEmpty(longs)){
+                longs.add(-1L);
+            }
+            DataPermissionsInterceptor.unitIdListEnable.set(longs);
+        }
+
         return joinPoint.proceed();
     }
 
