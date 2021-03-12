@@ -284,7 +284,10 @@ public class DataPermissionsInterceptor implements Interceptor{
 
     @Override
     public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(unitIdListEnable.get())){
+            return Plugin.wrap(target, this);
+        }
+        return target;
     }
 
     @Override

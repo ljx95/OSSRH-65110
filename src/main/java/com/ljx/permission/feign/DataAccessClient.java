@@ -25,19 +25,19 @@ public interface DataAccessClient {
     @RequestMapping(value = "/v1/{organizationId}/system/access/rules/users",
             method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<List<Long>> getUserIdsByRoleAndUserAndPermissionObject(@PathVariable(name = "organizationId") Long tenantId,
-                                                                          String permissionObject);
+                                                                          @RequestParam(name = "permissionObject")String permissionObject);
 
     @RequestMapping(
             value = "/v1/{organizationId}/system/access/rules/units",
             method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<List<Long>> listUnitByRoleAndUser(@PathVariable(name = "organizationId") Long tenantId,
-                                                     String permissionObject);
+                                                     @RequestParam(name = "permissionObject")String permissionObject);
 
     @RequestMapping(
             value = "/v1/{organizationId}/system/access/rules/unitCompanyIds",
             method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     ResponseEntity<List<Long>> listUnitCompanyIdByRoleAndUser(@PathVariable(name = "organizationId") Long tenantId,
-                                                              String permissionObject);
+                                                              @RequestParam(name = "permissionObject")String permissionObject);
 
     @RequestMapping(
             value = "/v1/{organizationId}/system/access/rules/get-rule-list",

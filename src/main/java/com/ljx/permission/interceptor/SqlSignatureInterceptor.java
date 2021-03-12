@@ -76,7 +76,7 @@ public class SqlSignatureInterceptor implements Interceptor {
             if (dataPermissionVO != null){
 
                 //开始构建Sql
-                String addSQL = this.buildSql(dataPermissionVO);
+                String addSQL = this.buildSql(dataPermissionVO,sqlSignature);
                 String mSql = this.buildNewSql(addSQL, sql);
 
                 this.resetSql2Invocation(invocation, mappedStatement, mSql, boundSql);
@@ -168,7 +168,7 @@ public class SqlSignatureInterceptor implements Interceptor {
         return null;
     }
 
-    private String buildSql(DataPermissionVO dataPermissionVO) {
+    private String buildSql(DataPermissionVO dataPermissionVO, SqlSignature sqlSignature) {
 //        StringBuilder stringBuilder = new StringBuilder(" and (1=2");
         StringBuilder stringBuilder = new StringBuilder("(1=2");
         boolean adminFlag = dataPermissionVO.isAdminFlag();
@@ -180,9 +180,9 @@ public class SqlSignatureInterceptor implements Interceptor {
         List<Long> unitIds = dataPermissionVO.getUnitIds();
         if (CollectionUtils.isNotEmpty(unitIds)){
             String str = StringUtils.join(unitIds.toArray(), ",");
-            stringBuilder.append(" or hc.department_id in (")
+            stringBuilder.append(" or ").append(sqlSignature.tableAlias()).append(".department_id in (")
                     .append(str).append(")")
-                    .append(" or hc.belonging_department_id in (")
+                    .append(" or ").append(sqlSignature.tableAlias()).append(".belonging_department_id in (")
                     .append(str).append(")");
         }
 
@@ -190,7 +190,7 @@ public class SqlSignatureInterceptor implements Interceptor {
         List<Long> companyIds = dataPermissionVO.getCompanyIds();
         if (CollectionUtils.isNotEmpty(companyIds)){
             String str = StringUtils.join(companyIds.toArray(), ",");
-            stringBuilder.append(" or hc.company_id in (")
+            stringBuilder.append(" or ").append(sqlSignature.tableAlias()).append(".company_id in (")
                     .append(str).append(")");
         }
 
@@ -198,7 +198,7 @@ public class SqlSignatureInterceptor implements Interceptor {
         List<Long> userIds = dataPermissionVO.getUserIds();
         if (CollectionUtils.isNotEmpty(userIds)){
             String str = StringUtils.join(userIds.toArray(), ",");
-            stringBuilder.append(" or hc.created_by in (")
+            stringBuilder.append(" or ").append(sqlSignature.tableAlias()).append(".created_by in (")
                     .append(str).append(")");
         }
 
@@ -206,7 +206,7 @@ public class SqlSignatureInterceptor implements Interceptor {
         List<Long> employeeIds = dataPermissionVO.getEmployeeIds();
         if (CollectionUtils.isNotEmpty(employeeIds)){
             String str = StringUtils.join(employeeIds.toArray(), ",");
-            stringBuilder.append(" or hc.principal_id in (")
+            stringBuilder.append(" or ").append(sqlSignature.tableAlias()).append(".principal_id in (")
                     .append(str).append(")");
         }
         stringBuilder.append(") ");
@@ -215,7 +215,7 @@ public class SqlSignatureInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        if(ConditionContextHolder.isEmpty()) {
+        if(!ConditionContextHolder.isEmpty()) {
             return Plugin.wrap(target, this);
         }
         return target;
