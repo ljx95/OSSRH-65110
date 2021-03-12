@@ -215,7 +215,7 @@ public class SqlSignatureInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        if(!ConditionContextHolder.isEmpty()) {
+        if(ConditionContextHolder.isEmpty()) {
             return Plugin.wrap(target, this);
         }
         return target;
