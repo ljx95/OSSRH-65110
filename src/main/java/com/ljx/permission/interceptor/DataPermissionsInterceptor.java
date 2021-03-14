@@ -94,12 +94,12 @@ public class DataPermissionsInterceptor implements Interceptor{
         String sql = boundSql.getSql().trim();
         String mSql = sql;
         if (permissionIntercept.flag()) {
-            PageInfo info = PageHelper.getLocalPage();
-            Sort sort = PageHelper.getLocalSort();
-            if (info != null || sort != null){
-                PageMethod.clearPage();
-                PageMethod.clearSort();
-            }
+//            PageInfo info = PageHelper.getLocalPage();
+//            Sort sort = PageHelper.getLocalSort();
+//            if (info != null || sort != null){
+//                PageMethod.clearPage();
+//                PageMethod.clearSort();
+//            }
             //初始化bean
             this.loadService();
             List<Long> unitIdList = this.getUnitIdList(mappedStatement, boundSql, permissionIntercept);
@@ -119,10 +119,10 @@ public class DataPermissionsInterceptor implements Interceptor{
             if (StringUtils.isNotEmpty(addSQL)){
                 mSql = this.buildNewSql(addSQL, sql);
             }
-            PageRequest pageRequest = new PageRequest();
-            pageRequest.setPage(info.getPage());
-            pageRequest.setSize(info.getSize());
-            PageMethod.startPageAndSort(pageRequest);
+//            PageRequest pageRequest = new PageRequest();
+//            pageRequest.setPage(info.getPage());
+//            pageRequest.setSize(info.getSize());
+//            PageMethod.startPageAndSort(pageRequest);
         }
 
         // 重新new一个查询语句对象
