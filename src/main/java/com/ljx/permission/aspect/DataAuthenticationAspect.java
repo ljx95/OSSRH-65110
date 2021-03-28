@@ -63,7 +63,8 @@ public class DataAuthenticationAspect {
         // 访问签订主体
         dataPermissionVO.setCompanyIds(dataAccessScopeService.accessCompanyId(userDetails.getTenantId(), permissionObject));
         accessUserAndEmployeeInfo(userDetails, dataPermissionVO, permissionObject);
-        dataPermissionVO.setContractAdmin(userDetails.getUserId());
+        Employee employee = EmployeeHelper.getEmployee(userDetails.getUserId(), userDetails.getTenantId());
+        dataPermissionVO.setContractAdmin(employee.getEmployeeNum());
         if (userDetails.getAdmin()) {
             dataPermissionVO.setAdminFlag(true);
         }

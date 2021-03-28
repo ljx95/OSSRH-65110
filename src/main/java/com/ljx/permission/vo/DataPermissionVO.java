@@ -35,6 +35,6 @@ public class DataPermissionVO {
     private List<Long> employeeIds;
 
     //合同管理员
-    private Long contractAdmin;
+    private String contractAdmin;
 }
 
