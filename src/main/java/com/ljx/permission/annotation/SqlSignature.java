@@ -17,4 +17,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SqlSignature {
     String tableAlias() default "hc";
+    String extTableFiled() default "";
 }

@@ -33,5 +33,8 @@ public class DataPermissionVO {
 
     // 用户对应的员工
     private List<Long> employeeIds;
+
+    //合同管理员
+    private Long contractAdmin;
 }
 

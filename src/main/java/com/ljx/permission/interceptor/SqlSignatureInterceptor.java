@@ -209,6 +209,12 @@ public class SqlSignatureInterceptor implements Interceptor {
             stringBuilder.append(" or ").append(sqlSignature.tableAlias()).append(".principal_id in (")
                     .append(str).append(")");
         }
+
+        //添加合同管理员
+        if(StringUtils.isNotEmpty(sqlSignature.extTableFiled())){
+            String[] split = sqlSignature.extTableFiled().split(".");
+            stringBuilder.append(" or ").append(sqlSignature.extTableFiled()).append("=").append(dataPermissionVO.getContractAdmin());
+        }
         stringBuilder.append(") ");
         return stringBuilder.toString();
     }
